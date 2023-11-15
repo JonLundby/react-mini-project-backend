@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, request, response } from "express";
 import connection from "./database.js";
 
 const namesRouter = Router();
@@ -24,17 +24,34 @@ namesRouter.get("/", async (req, res) => {
 });
 
 // GET specific name
-namesRouter.get("/:id", async (request, response) => {
-  const id = request.params.id;
+namesRouter.get("/:id", async (req, res) => {
+  const id = req.params.id;
   console.log(id);
-  const query = "SELECT * FROM react_group WHERE id=?;";
+  const queryString = "SELECT * FROM react_group WHERE id=?;";
   const values = [id];
   
-  connection.query(query, values, (err, results, fields) => {
+  connection.query(queryString, values, (err, results, fields) => {
     if (err) {
       console.log(err);
     } else {
-      response.json(results[0]); //[0] makes the return a single object instead of array with one object
+      res.json(results[0]); //[0] makes the return a single object instead of array with one object
+    }
+  });
+});
+
+namesRouter.post("/", async (req, res) => {
+  const artist = req.body;
+  console.log(artist)
+
+  const queryString = "INSERT INTO react_group (first_name, last_name) VALUES(?, ?)";
+
+  const values = [artist.first_name, artist.last_name]
+
+  connection.query(queryString, values, (err, results, fields) => {
+    if (err) {
+      console.log(err)
+    } else {
+      res.json(results);
     }
   });
 });
